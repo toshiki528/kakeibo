@@ -4,14 +4,14 @@ import { useState, useEffect, useCallback } from "react";
 import { getMonthlySavings, upsertMonthlySaving } from "@/lib/api";
 import { PERSONS, type Person } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
+import { useRealtimeTable } from "@/lib/useRealtimeTable";
 
 interface Props {
   year: number;
   month: number;
-  onUpdate: () => void;
 }
 
-export default function SavingsInput({ year, month, onUpdate }: Props) {
+export default function SavingsInput({ year, month }: Props) {
   const [amounts, setAmounts] = useState<Record<Person, string>>({
     俊樹: "",
     ハン: "",
@@ -31,12 +31,13 @@ export default function SavingsInput({ year, month, onUpdate }: Props) {
     load();
   }, [load]);
 
+  useRealtimeTable("monthly_savings", undefined, load);
+
   const save = async (person: Person) => {
     const val = parseInt(amounts[person]) || 0;
     setSaving(true);
     await upsertMonthlySaving(year, month, person, val);
     setSaving(false);
-    onUpdate();
   };
 
   return (

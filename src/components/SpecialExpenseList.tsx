@@ -12,14 +12,14 @@ import {
   type SpecialExpense,
 } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
+import { useRealtimeTable } from "@/lib/useRealtimeTable";
 
 interface Props {
   year: number;
   month: number;
-  onUpdate: () => void;
 }
 
-export default function SpecialExpenseList({ year, month, onUpdate }: Props) {
+export default function SpecialExpenseList({ year, month }: Props) {
   const [items, setItems] = useState<SpecialExpense[]>([]);
   const [category, setCategory] = useState<ExpenseCategory>("旅行");
   const [amount, setAmount] = useState("");
@@ -35,6 +35,8 @@ export default function SpecialExpenseList({ year, month, onUpdate }: Props) {
     load();
   }, [load]);
 
+  useRealtimeTable("special_expenses", undefined, load);
+
   const handleAdd = async () => {
     const val = parseInt(amount);
     if (!val || val <= 0) return;
@@ -44,13 +46,11 @@ export default function SpecialExpenseList({ year, month, onUpdate }: Props) {
     setMemo("");
     await load();
     setAdding(false);
-    onUpdate();
   };
 
   const handleDelete = async (id: string) => {
     await deleteSpecialExpense(id);
     await load();
-    onUpdate();
   };
 
   const total = items.reduce((s, i) => s + i.amount, 0);

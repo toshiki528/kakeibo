@@ -8,14 +8,14 @@ import {
 } from "@/lib/api";
 import { PERSONS, type Person, type ExtraIncome } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
+import { useRealtimeTable } from "@/lib/useRealtimeTable";
 
 interface Props {
   year: number;
   month: number;
-  onUpdate: () => void;
 }
 
-export default function ExtraIncomeList({ year, month, onUpdate }: Props) {
+export default function ExtraIncomeList({ year, month }: Props) {
   const [items, setItems] = useState<ExtraIncome[]>([]);
   const [person, setPerson] = useState<Person>("俊樹");
   const [amount, setAmount] = useState("");
@@ -31,6 +31,8 @@ export default function ExtraIncomeList({ year, month, onUpdate }: Props) {
     load();
   }, [load]);
 
+  useRealtimeTable("extra_income", undefined, load);
+
   const handleAdd = async () => {
     const val = parseInt(amount);
     if (!val || val <= 0) return;
@@ -40,13 +42,11 @@ export default function ExtraIncomeList({ year, month, onUpdate }: Props) {
     setMemo("");
     await load();
     setAdding(false);
-    onUpdate();
   };
 
   const handleDelete = async (id: string) => {
     await deleteExtraIncome(id);
     await load();
-    onUpdate();
   };
 
   const total = items.reduce((s, i) => s + i.amount, 0);

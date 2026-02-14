@@ -3,14 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { getMonthlySavings, getExtraIncomes, getSpecialExpenses } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
+import { useRealtimeTable } from "@/lib/useRealtimeTable";
 
 interface Props {
   year: number;
   month: number;
-  refreshKey: number;
 }
 
-export default function MonthlySummary({ year, month, refreshKey }: Props) {
+export default function MonthlySummary({ year, month }: Props) {
   const [data, setData] = useState({
     savings: 0,
     income: 0,
@@ -29,11 +29,15 @@ export default function MonthlySummary({ year, month, refreshKey }: Props) {
       income: incomes.reduce((s, r) => s + r.amount, 0),
       expense: expenses.reduce((s, r) => s + r.amount, 0),
     });
-  }, [year, month, refreshKey]);
+  }, [year, month]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  useRealtimeTable("monthly_savings", undefined, load);
+  useRealtimeTable("extra_income", undefined, load);
+  useRealtimeTable("special_expenses", undefined, load);
 
   const net = data.savings + data.income - data.expense;
 

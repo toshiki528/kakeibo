@@ -12,10 +12,7 @@ export default function Home() {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [tab, setTab] = useState<"monthly" | "report">("monthly");
-
-  const refresh = () => setRefreshKey((k) => k + 1);
 
   return (
     <main className="min-h-screen bg-gray-50 pb-20">
@@ -61,31 +58,27 @@ export default function Home() {
               <MonthlySummary
                 year={year}
                 month={month}
-                refreshKey={refreshKey}
               />
               <SavingsInput
                 key={`s-${year}-${month}`}
                 year={year}
                 month={month}
-                onUpdate={refresh}
               />
               <ExtraIncomeList
                 key={`e-${year}-${month}`}
                 year={year}
                 month={month}
-                onUpdate={refresh}
               />
               <SpecialExpenseList
                 key={`x-${year}-${month}`}
                 year={year}
                 month={month}
-                onUpdate={refresh}
               />
             </div>
           </>
         ) : (
           <div className="py-4 space-y-4">
-            <YearlyReport key={refreshKey} />
+            <YearlyReport />
           </div>
         )}
       </div>
