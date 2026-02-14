@@ -7,7 +7,7 @@ import {
   deleteExtraIncome,
 } from "@/lib/api";
 import { PERSONS, type Person, type ExtraIncome } from "@/lib/types";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatNumberInput, parseNumberInput } from "@/lib/utils";
 import { useRealtimeTable } from "@/lib/useRealtimeTable";
 
 interface Props {
@@ -34,7 +34,7 @@ export default function ExtraIncomeList({ year, month }: Props) {
   useRealtimeTable("extra_income", undefined, load);
 
   const handleAdd = async () => {
-    const val = parseInt(amount);
+    const val = parseNumberInput(amount);
     if (!val || val <= 0) return;
     setAdding(true);
     await addExtraIncome(year, month, person, val, memo);
@@ -100,10 +100,10 @@ export default function ExtraIncomeList({ year, month }: Props) {
             ))}
           </select>
           <input
-            type="number"
+            type="text"
             inputMode="numeric"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(formatNumberInput(e.target.value))}
             placeholder="金額"
             className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-right focus:border-green-500 focus:outline-none"
           />

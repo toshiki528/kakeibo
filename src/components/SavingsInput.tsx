@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getMonthlySavings, upsertMonthlySaving } from "@/lib/api";
 import { PERSONS, type Person } from "@/lib/types";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatNumberInput, parseNumberInput } from "@/lib/utils";
 import { useRealtimeTable } from "@/lib/useRealtimeTable";
 
 interface Props {
@@ -22,7 +22,7 @@ export default function SavingsInput({ year, month }: Props) {
     const data = await getMonthlySavings(year, month);
     const next: Record<Person, string> = { 俊樹: "", ハン: "" };
     for (const d of data) {
-      next[d.person as Person] = d.amount.toString();
+      next[d.person as Person] = d.amount ? d.amount.toLocaleString("ja-JP") : "";
     }
     setAmounts(next);
   }, [year, month]);
@@ -34,7 +34,7 @@ export default function SavingsInput({ year, month }: Props) {
   useRealtimeTable("monthly_savings", undefined, load);
 
   const save = async (person: Person) => {
-    const val = parseInt(amounts[person]) || 0;
+    const val = parseNumberInput(amounts[person]);
     setSaving(true);
     await upsertMonthlySaving(year, month, person, val);
     setSaving(false);
@@ -48,11 +48,11 @@ export default function SavingsInput({ year, month }: Props) {
           <div key={person} className="flex items-center gap-2">
             <span className="w-14 font-medium text-sm">{person}</span>
             <input
-              type="number"
+              type="text"
               inputMode="numeric"
               value={amounts[person]}
               onChange={(e) =>
-                setAmounts((a) => ({ ...a, [person]: e.target.value }))
+                setAmounts((a) => ({ ...a, [person]: formatNumberInput(e.target.value) }))
               }
               onBlur={() => save(person)}
               placeholder="0"
@@ -70,7 +70,7 @@ export default function SavingsInput({ year, month }: Props) {
         <span className="font-bold text-blue-700">
           {formatCurrency(
             PERSONS.reduce(
-              (s, p) => s + (parseInt(amounts[p]) || 0),
+              (s, p) => s + parseNumberInput(amounts[p]),
               0
             )
           )}

@@ -11,7 +11,7 @@ import {
   type ExpenseCategory,
   type SpecialExpense,
 } from "@/lib/types";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatNumberInput, parseNumberInput } from "@/lib/utils";
 import { useRealtimeTable } from "@/lib/useRealtimeTable";
 
 interface Props {
@@ -38,7 +38,7 @@ export default function SpecialExpenseList({ year, month }: Props) {
   useRealtimeTable("special_expenses", undefined, load);
 
   const handleAdd = async () => {
-    const val = parseInt(amount);
+    const val = parseNumberInput(amount);
     if (!val || val <= 0) return;
     setAdding(true);
     await addSpecialExpense(year, month, category, val, memo);
@@ -108,7 +108,7 @@ export default function SpecialExpenseList({ year, month }: Props) {
             onChange={(e) =>
               setCategory(e.target.value as ExpenseCategory)
             }
-            className="rounded-lg border border-gray-300 px-2 py-2 text-sm"
+            className="w-28 shrink-0 rounded-lg border border-gray-300 px-2 py-2 text-sm"
           >
             {EXPENSE_CATEGORIES.map((c) => (
               <option key={c} value={c}>
@@ -117,12 +117,12 @@ export default function SpecialExpenseList({ year, month }: Props) {
             ))}
           </select>
           <input
-            type="number"
+            type="text"
             inputMode="numeric"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => setAmount(formatNumberInput(e.target.value))}
             placeholder="金額"
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-right focus:border-red-500 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2 text-right focus:border-red-500 focus:outline-none"
           />
           <span className="self-center text-sm text-gray-500">円</span>
         </div>
